@@ -36,13 +36,13 @@ def customer(request, user_pk):
     return render(request, 'customerAdminApp/customer.html', context)
 
 def createOrder(request, user_id):
-    OredeFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'))
+    OredeFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'), extra=10)
     customer = Customer.objects.get(id=user_id)
-    formset = OredeFormSet(instance=customer)
+    formset = OredeFormSet(queryset=Order.objects.none(), instance=customer)
     if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            form.save()
+        formset = OredeFormSet(request.POST, instance=customer)
+        if formset.is_valid():
+            formset.save()
             return redirect('/')
     context={'formset': formset}
     return render(request, 'customerAdminApp/orderForm.html', context)
