@@ -36,7 +36,7 @@ def customer(request, user_pk):
     return render(request, 'customerAdminApp/customer.html', context)
 
 def createOrder(request, user_id):
-    OredeFormSet = inlineformset_factory(Customer, Order, fields=('products', 'status'))
+    OredeFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'))
     customer = Customer.objects.get(id=user_id)
     formset = OredeFormSet(instance=customer)
     if request.method == 'POST':
