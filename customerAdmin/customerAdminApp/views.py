@@ -35,19 +35,24 @@ def customer(request, user_pk):
     customers = Customer.objects.get(id=user_pk)
     orders = customers.order_set.all()
     order_count = orders.count()
+    myFilter = OrderFilter()
 
     context = {'customers': customers,
-               'orders': orders, 'order_count': order_count, }
+               'orders': orders, 'order_count': order_count, 'myFilter':myFilter }
     return render(request, 'customerAdminApp/customer.html', context)
 
 
 def createOrder(request, user_id):
-    customer = Customer.object.get(id=user_id)
-    orders = customer.order_set.all()
-    order_count = orders.count()
-    myFilter = OrderFilter(request.GET, queryset=orders)
-    orders = myFilter.qs
-    context = {'customer':customer, 'oreders':orders, 'order_count':order_count, 'myFilter':myFilter}
+    OredeFormSet = inlineformset_factory(
+        Customer, Order, fields=('product', 'status'), extra=10)
+    customer = Customer.objects.get(id=user_id)
+    formset = OredeFormSet(queryset=Order.objects.none(), instance=customer)
+    if request.method == 'POST':
+        formset = OredeFormSet(request.POST, instance=customer)
+        if formset.is_valid():
+            formset.save()
+            return redirect('/')
+    context = {'formset': formset}
     return render(request, 'customerAdminApp/orderForm.html', context)
 
 
